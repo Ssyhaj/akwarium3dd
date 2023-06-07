@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\cube.cpp" />
+    <ClCompile Include="src\lodepng.cpp" />
+    <ClCompile Include="main_file.cpp" />
+    <ClCompile Include="src\model.cpp" />
+    <ClCompile Include="src\shaderprogram.cpp" />
+    <ClCompile Include="src\sphere.cpp" />
+    <ClCompile Include="src\teapot.cpp" />
+    <ClCompile Include="src\torus.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\allmodels.h" />
+    <ClInclude Include="include\constants.h" />
+    <ClInclude Include="include\cube.h" />
+    <ClInclude Include="include\lodepng.h" />
+    <ClInclude Include="include\model.h" />
+    <ClInclude Include="include\myCube.h" />
+    <ClInclude Include="include\shaderprogram.h" />
+    <ClInclude Include="include\sphere.h" />
+    <ClInclude Include="include\teapot.h" />
+    <ClInclude Include="include\torus.h" />
+    <ClInclude Include="include\ObjLoader.h" />
+    <ClInclude Include="include\Vertex.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\f_colored.glsl" />
+    <None Include="shaders\f_constant.glsl" />
+    <None Include="shaders\f_lambert.glsl" />
+    <None Include="shaders\f_lamberttextured.glsl" />
+    <None Include="shaders\f_textured.glsl" />
+    <None Include="shaders\v_colored.glsl" />
+    <None Include="shaders\v_constant.glsl" />
+    <None Include="shaders\v_lambert.glsl" />
+    <None Include="shaders\v_lamberttextured.glsl" />
+    <None Include="shaders\v_textured.glsl" />
+    <None Include="models\fish.fbx" />
+    <None Include="models\plants.fbx" />
+    <None Include="models\gun.fbx" />
+    <None Include="models\fishes.fbx" />
+    <None Include="models\Rock0.fbx" />
+    <None Include="models\Rock1.fbx" />
+    <None Include="models\Rock2.fbx" />
+    <None Include="models\Rock3.fbx" />
+    <None Include="models\Rock4.fbx" />
+    <None Include="models\Rock5.fbx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="img\fish.png" />
+    <Image Include="img\rock0.png" />
+    <Image Include="img\rock1.png" />
+    <Image Include="img\rock2.png" />
+    <Image Include="img\rock3.png" />
+    <Image Include="img\rock5.png" />
+    <Image Include="img\rock4.png" />
+    <Image Include="img\rock6.png" />
+    <Image Include="img\fish2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="models\IronMan.obj" />
+  </ItemGroup>
+</Project>
