@@ -31,11 +31,12 @@
 #define ROCK4 5
 #define ROCK5 6
 #define ROCK6 7
-#define AKWAR 8
-#define FISH1 9
-#define NEMO 10
-#define PLANTS 11
-#define PLANTS1 12	
+#define ROCK7 8
+#define AKWAR 9
+#define FISH1 10
+#define NEMO 11
+#define PLANTS 12
+#define PLANTS1 13
 
 #define TEX_FISH 0
 #define TEX_TANK 1
@@ -205,7 +206,7 @@ void initOpenGLProgram(GLFWwindow* window) {
 	readTexture("./img/tank2.png", TEX_TANK);
 	readTexture("./img/rock0.png", TEX_ROCK1);
 	readTexture("./img/rock1.png", TEX_ROCK2);
-	readTexture("./img/rock2.png", TEX_ROCK3);
+	readTexture("./img/sand.png", TEX_ROCK3);
 	readTexture("./img/rock3.png", TEX_ROCK4);
 	readTexture("./img/rock4.png", TEX_ROCK5);
 	readTexture("./img/rock5.png", TEX_ROCK6);
@@ -224,6 +225,7 @@ void initOpenGLProgram(GLFWwindow* window) {
 	loadModel(std::string("models/Rock3.fbx"), ROCK4);
 	loadModel(std::string("models/Rock4.fbx"), ROCK5);
 	loadModel(std::string("models/Rock5.fbx"), ROCK6);
+	loadModel(std::string("models/podloze.obj"), ROCK7);
 	loadModel(std::string("models/akwarium.obj"), AKWAR);
 	loadModel(std::string("models/fish_h.obj"), FISH1);
 	loadModel(std::string("models/nemo.obj"), NEMO);
@@ -268,67 +270,6 @@ void drawGlass(glm::mat4 P, glm::mat4 V, glm::mat4 M) {
 	glDisableVertexAttribArray(glassShader->a("normal"));
 }
 
-void drawButtom(glm::mat4 P, glm::mat4 V, glm::mat4 M) {
-	float bottomTexCoords[] = {
-		4.0f, 4.0f,	  0.0f, 0.0f,    0.0f, 4.0f,
-		4.0f, 4.0f,   4.0f, 0.0f,    0.0f, 0.0f,
-	};
-
-	float bottomVertices[] = {
-		8.0f,-6.0f, 6.0f,1.0f,
-		8.0f, 6.0f,-6.0f,1.0f,
-		8.0f,-6.0f,-6.0f,1.0f,
-
-		8.0f,-6.0f, 6.0f,1.0f,
-		8.0f, 6.0f, 6.0f,1.0f,
-		8.0f, 6.0f,-6.0f,1.0f,
-	};
-
-	float bottomVertexNormals[] = {
-		1.0f, -1.0f, 1.0f, 0.0f,
-		1.0f, 1.0f, -1.0f, 0.0f,
-		1.0f, -1.0f, -1.0f, 0.0f,
-
-		1.0f, -1.0f, 1.0f, 0.0f,
-		1.0f, 1.0f, 1.0f, 0.0f,
-		1.0f, 1.0f, -1.0f, 0.0f,
-	};
-
-	int bottomVertexCount = 6;
-
-	waterShader->use();
-
-	glUniformMatrix4fv(waterShader->u("P"), 1, false, glm::value_ptr(P)); 
-	glUniformMatrix4fv(waterShader->u("V"), 1, false, glm::value_ptr(V));
-	glUniformMatrix4fv(waterShader->u("M"), 1, false, glm::value_ptr(M));
-
-	glEnableVertexAttribArray(waterShader->a("vertex"));
-	glVertexAttribPointer(waterShader->a("vertex"), 4, GL_FLOAT, false, 0, bottomVertices);
-
-	glEnableVertexAttribArray(waterShader->a("normal"));
-	glVertexAttribPointer(waterShader->a("normal"), 4, GL_FLOAT, false, 0, bottomVertexNormals);
-
-	glEnableVertexAttribArray(waterShader->a("texCoord"));
-	glVertexAttribPointer(waterShader->a("texCoord"), 2, GL_FLOAT, false, 0, bottomTexCoords);
-
-	glTexParameteri(GL_TEXTURE_2D,
-		GL_TEXTURE_WRAP_S,
-		GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D,
-		GL_TEXTURE_WRAP_T,
-		GL_REPEAT);
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texs[TEX_BOTTOM]);
-	glUniform1i(waterShader->u("tex"), 0);
-
-	glDrawArrays(GL_TRIANGLES, 0, bottomVertexCount);
-
-	glDisableVertexAttribArray(waterShader->a("vertex"));
-	glDisableVertexAttribArray(waterShader->a("normal"));
-	glDisableVertexAttribArray(waterShader->a("texCoord"));
-}
-
 void drawModel(glm::mat4 P, glm::mat4 V, glm::mat4 M, int model_i, int texture) {
 	waterShader->use();
 
@@ -360,12 +301,17 @@ void drawRocks(glm::mat4 P, glm::mat4 V) {
 	rocks = glm::translate(rocks, glm::vec3(0.0f, -7.85f, 0.0f));
 	//	rocks = glm::scale(rocks, glm::vec3(0.005f, 0.005f, 0.005f));
 	rocks = glm::scale(rocks, glm::vec3(0.25f, 0.25f, 0.25f));
+	glm::mat4 rocks1 = glm::mat4(1.0f);
+	rocks1 = glm::scale(rocks1, glm::vec3(6.0f, 0.1f, 6.0f));
 	float wsp = 400;
 
 
 
 	glm::mat4 rock1 = glm::translate(rocks, glm::vec3(0.0f, -2.0f, 0.0f));
 	drawModel(P, V, rock1, ROCK1, TEX_ROCK1);
+
+	glm::mat4 rock2 = glm::translate(rocks1, glm::vec3(0.0f, -80.0f, 0.0f));
+	drawModel(P, V, rock2, ROCK7, TEX_ROCK3);
 }
 
 void drawLight(glm::mat4 P, glm::mat4 V, glm::mat4 M) {
@@ -380,32 +326,6 @@ void drawLight(glm::mat4 P, glm::mat4 V, glm::mat4 M) {
 	glUniform4f(spConstant->u("color"), 1, 1, 0.8, 1);
 
 	light.drawSolid();
-}
-
-void drawTank(glm::mat4 P, glm::mat4 V, glm::mat4 M) {
-	phongShader->use(); 
-
-	glUniformMatrix4fv(phongShader->u("P"), 1, false, glm::value_ptr(P)); 
-	glUniformMatrix4fv(phongShader->u("V"), 1, false, glm::value_ptr(V)); 
-	glUniformMatrix4fv(phongShader->u("M"), 1, false, glm::value_ptr(M));
-	glUniform4fv(phongShader->u("light1"), 1, glm::value_ptr(light1));
-	glUniform4fv(phongShader->u("light2"), 1, glm::value_ptr(light2));
-
-	glEnableVertexAttribArray(phongShader->a("vertex"));
-	glVertexAttribPointer(phongShader->a("vertex"), 4, GL_FLOAT, false, 0, models[TANK].Vertices.data()); 
-
-	glEnableVertexAttribArray(phongShader->a("texCoord"));
-	glVertexAttribPointer(phongShader->a("texCoord"), 2, GL_FLOAT, false, 0, models[TANK].TexCoords.data()); 
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texs[TANK]);
-	glUniform1i(phongShader->u("tex"), 0);
-
-	glDrawElements(GL_TRIANGLES, models[TANK].Indices.size(), GL_UNSIGNED_INT, models[TANK].Indices.data());
-
-	glDisableVertexAttribArray(phongShader->a("vertex"));
-	glDisableVertexAttribArray(phongShader->a("normal"));
-	glDisableVertexAttribArray(phongShader->a("color"));
 }
 
 void drawPlants(glm::mat4 P, glm::mat4 V) {
@@ -433,7 +353,6 @@ void drawScene(GLFWwindow* window,float angle) {
 
 	glm::mat4 Mb = glm::translate(Mb, glm::vec3(-5.0f, 0.0f, 0.0f));
 	M = glm::rotate(M, -PI/2, glm::vec3(0.0f, 0.0f, 1.0f));
-	drawButtom(P, V, M);
 
 	float wsp_nemo = 0.1f;
 	float wsp_fish_h = 0.1f;
@@ -443,45 +362,45 @@ void drawScene(GLFWwindow* window,float angle) {
 	glm::mat4 FishMatrix_h = glm::scale(FishMatrix, glm::vec3(wsp_fish_h, wsp_fish_h, wsp_fish_h));
 
 
-	glm::mat4 Mf = glm::rotate(NemoMatrix, angle * 0.5f, glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 Mf = glm::rotate(NemoMatrix, angle * 0.15f, glm::vec3(0.0f, -1.0f, 0.0f));
 	Mf = glm::translate(Mf, glm::vec3(4.0f / wsp_nemo, 0.0f, 0.0f));
 	drawModel(P, V, Mf, NEMO, TEX_FISH2);
-
-	glm::mat4 Mf1 = glm::rotate(FishMatrix_h, -angle * 0.5f, glm::vec3(0.0f, 1.0f, 0.0f));
+	
+	glm::mat4 Mf1 = glm::rotate(FishMatrix_h, -angle * 0.5f, glm::vec3(0.0f, -1.0f, 0.0f));
 	Mf1 = glm::translate(Mf1, glm::vec3(2.0f / wsp_fish_h, 2.0f / wsp_fish_h, 0.0f));
 	drawModel(P, V, Mf1, FISH1, TEX_FISH4);
 
-	glm::mat4 Mf2 = glm::rotate(NemoMatrix, angle * 0.9f, glm::vec3(0.0f, 1.0f, 0.0f));
-	Mf2 = glm::translate(Mf2, glm::vec3(1.0f / wsp_nemo, -3.0f / wsp_nemo, 0.0f));
+	glm::mat4 Mf2 = glm::rotate(NemoMatrix, angle * 0.19f, glm::vec3(0.0f, -1.0f, 0.0f));
+	Mf2 = glm::translate(Mf2, glm::vec3(1.0f / wsp_nemo, 1.0f / wsp_nemo, 0.0f));
 	drawModel(P, V, Mf2, NEMO, TEX_FISH2);
 
-	glm::mat4 Mf3 = glm::rotate(FishMatrix_h, -angle * 0.01f, glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 Mf3 = glm::rotate(FishMatrix_h, -angle * 0.01f, glm::vec3(0.0f, -1.0f, 0.0f));
 	Mf3 = glm::translate(Mf3, glm::vec3(4.0f / wsp_fish_h, 3.0f / wsp_fish_h, 0.0f));
 	drawModel(P, V, Mf3, FISH1, TEX_FISH4);
 
-	glm::mat4 Mf4 = glm::rotate(NemoMatrix, angle * 0.6f, glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 Mf4 = glm::rotate(NemoMatrix, angle * 0.16f, glm::vec3(0.0f, -1.0f, 0.0f));
 	Mf4 = glm::translate(Mf4, glm::vec3(6.0f / wsp_nemo, 2.0f / wsp_nemo, 0.0f));
 	drawModel(P, V, Mf4, NEMO, TEX_FISH2);
 
-	glm::mat4 Mf5 = glm::rotate(NemoMatrix, angle * 0.01f, glm::vec3(0.0f, 1.0f, 0.0f));  // to jest w prawo
-	Mf5 = glm::translate(Mf5, glm::vec3(3.0f / wsp_nemo, -2.0f / wsp_nemo, 0.0f));
+	glm::mat4 Mf5 = glm::rotate(NemoMatrix, angle * 0.01f, glm::vec3(0.0f, -1.0f, 0.0f));  // to jest w prawo
+	Mf5 = glm::translate(Mf5, glm::vec3(3.0f / wsp_nemo, 1.0f / wsp_nemo, 0.0f));
 	drawModel(P, V, Mf5, NEMO, TEX_FISH2);
 
-	glm::mat4 Mf7 = glm::rotate(M, angle * 0.01f, glm::vec3(1.0f, 0.0f, 0.0f));  // to jest w prawo
+	glm::mat4 Mf7 = glm::rotate(M, angle * 0.01f, glm::vec3(-1.0f, 0.0f, 0.0f));  // to jest w prawo
 	Mf7 = glm::translate(Mf7, glm::vec3(3.0f, 0.0f, 2.7f));
 	drawModel(P, V, Mf7, FISH, TEX_FISH);
 
-	glm::mat4 Mf8 = glm::rotate(M, -0.01f * angle, glm::vec3(1.0f, 0.0f, 0.0f));  // to jest  w lewo
+	glm::mat4 Mf8 = glm::rotate(M, -0.01f * angle, glm::vec3(-1.0f, 0.0f, 0.0f));  // to jest  w lewo
 	Mf8 = glm::translate(Mf8, glm::vec3(1.0f, 0.0f, 2.5f));
 	Mf8 = glm::rotate(Mf8, PI, glm::vec3(1.0f, 0.0f, 0.0f));
 	drawModel(P, V, Mf8, FISH, TEX_FISH);
 
-	glm::mat4 Mf9 = glm::rotate(M, -angle * 0.01f, glm::vec3(1.0f, 0.0f, 0.0f));  // to jest w prawo
-	Mf9 = glm::translate(Mf9, glm::vec3(7.0f, 0.0f, -5.7f));
+	glm::mat4 Mf9 = glm::rotate(M, -angle * 0.01f, glm::vec3(-1.0f, 0.0f, 0.0f));  // to jest w prawo
+	Mf9 = glm::translate(Mf9, glm::vec3(3.0f, 0.0f, -0.7f));
 	drawModel(P, V, Mf9, FISH, TEX_FISH);
 
-	glm::mat4 Mf10 = glm::rotate(M, -angle * 0.8f, glm::vec3(1.0f, 0.0f, 0.0f));  // to jest w prawo
-	Mf10 = glm::translate(Mf10, glm::vec3(4.0f, 0.0f, -2.7f));
+	glm::mat4 Mf10 = glm::rotate(M, -angle * 0.8f, glm::vec3(-0.1f, 0.0f, 0.0f));  // to jest w prawo
+	Mf10 = glm::translate(Mf10, glm::vec3(-2.0f, 0.0f, -2.7f));
 	drawModel(P, V, Mf10, FISH, TEX_FISH);
 
 	drawRocks(P, V);
@@ -490,7 +409,6 @@ void drawScene(GLFWwindow* window,float angle) {
 
 	glm::mat4 Mt = glm::rotate(M, PI / 2, glm::vec3(0.0f, 1.0f, 0.0f));
 	Mt = glm::scale(Mt, glm::vec3(6.0f, 6.0f, 6.0f));
-	drawTank(P, V, Mt);
 
 	glm::mat4 Mg = glm::scale(M, glm::vec3(8.0f, 6.0f, 6.0f));
 	drawGlass(P, V, Mg);
