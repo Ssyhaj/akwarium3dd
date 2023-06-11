@@ -29,7 +29,7 @@
 #define ROCK2 3
 #define AKWAR 4
 #define FISH1 5
-#define NEMO 6
+#define FISH2 6
 #define PLANTS 7
 
 #define TEX_FISH 0
@@ -161,7 +161,7 @@ void readTexture(const char* filename, int tex_i) {
 
 void initOpenGLProgram(GLFWwindow* window) {
     initShaders();
-	glClearColor(0.1, 0.984, 0.1, 0.5); 
+	glClearColor(0.9, 0.9, 0.9, 0.5); 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -186,7 +186,7 @@ void initOpenGLProgram(GLFWwindow* window) {
 	loadModel(std::string("models/podloze.obj"), ROCK2);
 	loadModel(std::string("models/akwarium.obj"), AKWAR);
 	loadModel(std::string("models/fish_h.obj"), FISH1);
-	loadModel(std::string("models/nemo.obj"), NEMO);
+	loadModel(std::string("models/nemo.obj"), FISH2);
 	loadModel(std::string("models/plants.obj"), PLANTS);
 
 	waterShader = new ShaderProgram("v_water.glsl", NULL, "f_water.glsl");
@@ -311,7 +311,7 @@ void drawScene(GLFWwindow* window,float angle) {
 
 	glm::mat4 Mf = glm::rotate(NemoMatrix, angle * 0.15f, glm::vec3(0.0f, -1.0f, 0.0f));
 	Mf = glm::translate(Mf, glm::vec3(4.0f / wsp_nemo, 0.0f, 0.0f));
-	drawModel(P, V, Mf, NEMO, TEX_FISH1);
+	drawModel(P, V, Mf, FISH2, TEX_FISH1);
 	
 	glm::mat4 Mf1 = glm::rotate(FishMatrix_h, -angle * 0.5f, glm::vec3(0.0f, -1.0f, 0.0f));
 	Mf1 = glm::translate(Mf1, glm::vec3(2.0f / wsp_fish_h, 2.0f / wsp_fish_h, 0.0f));
@@ -319,7 +319,7 @@ void drawScene(GLFWwindow* window,float angle) {
 
 	glm::mat4 Mf2 = glm::rotate(NemoMatrix, angle * 0.19f, glm::vec3(0.0f, -1.0f, 0.0f));
 	Mf2 = glm::translate(Mf2, glm::vec3(1.0f / wsp_nemo, 1.0f / wsp_nemo, 0.0f));
-	drawModel(P, V, Mf2, NEMO, TEX_FISH1);
+	drawModel(P, V, Mf2, FISH2, TEX_FISH1);
 
 	glm::mat4 Mf3 = glm::rotate(FishMatrix_h, -angle * 0.01f, glm::vec3(0.0f, -1.0f, 0.0f));
 	Mf3 = glm::translate(Mf3, glm::vec3(4.0f / wsp_fish_h, 3.0f / wsp_fish_h, 0.0f));
@@ -327,26 +327,26 @@ void drawScene(GLFWwindow* window,float angle) {
 
 	glm::mat4 Mf4 = glm::rotate(NemoMatrix, angle * 0.16f, glm::vec3(0.0f, -1.0f, 0.0f));
 	Mf4 = glm::translate(Mf4, glm::vec3(6.0f / wsp_nemo, 2.0f / wsp_nemo, 0.0f));
-	drawModel(P, V, Mf4, NEMO, TEX_FISH1);
+	drawModel(P, V, Mf4, FISH2, TEX_FISH1);
 
-	glm::mat4 Mf5 = glm::rotate(NemoMatrix, angle * 0.01f, glm::vec3(0.0f, -1.0f, 0.0f));  // to jest w prawo
+	glm::mat4 Mf5 = glm::rotate(NemoMatrix, angle * 0.01f, glm::vec3(0.0f, -1.0f, 0.0f)); 
 	Mf5 = glm::translate(Mf5, glm::vec3(3.0f / wsp_nemo, 1.0f / wsp_nemo, 0.0f));
-	drawModel(P, V, Mf5, NEMO, TEX_FISH1);
+	drawModel(P, V, Mf5, FISH2, TEX_FISH1);
 
-	glm::mat4 Mf7 = glm::rotate(M, angle * 0.01f, glm::vec3(-1.0f, 0.0f, 0.0f));  // to jest w prawo
+	glm::mat4 Mf7 = glm::rotate(M, angle * 0.01f, glm::vec3(-1.0f, 0.0f, 0.0f));  
 	Mf7 = glm::translate(Mf7, glm::vec3(3.0f, 0.0f, 2.7f));
 	drawModel(P, V, Mf7, FISH, TEX_FISH);
 
-	glm::mat4 Mf8 = glm::rotate(M, -0.01f * angle, glm::vec3(-1.0f, 0.0f, 0.0f));  // to jest  w lewo
+	glm::mat4 Mf8 = glm::rotate(M, -0.01f * angle, glm::vec3(-1.0f, 0.0f, 0.0f)); 
 	Mf8 = glm::translate(Mf8, glm::vec3(1.0f, 0.0f, 2.5f));
 	Mf8 = glm::rotate(Mf8, PI, glm::vec3(1.0f, 0.0f, 0.0f));
 	drawModel(P, V, Mf8, FISH, TEX_FISH);
 
-	glm::mat4 Mf9 = glm::rotate(M, -angle * 0.01f, glm::vec3(-1.0f, 0.0f, 0.0f));  // to jest w prawo
+	glm::mat4 Mf9 = glm::rotate(M, -angle * 0.01f, glm::vec3(-1.0f, 0.0f, 0.0f)); 
 	Mf9 = glm::translate(Mf9, glm::vec3(3.0f, 0.0f, -0.7f));
 	drawModel(P, V, Mf9, FISH, TEX_FISH);
 
-	glm::mat4 Mf10 = glm::rotate(M, -angle * 0.8f, glm::vec3(-0.1f, 0.0f, 0.0f));  // to jest w prawo
+	glm::mat4 Mf10 = glm::rotate(M, -angle * 0.8f, glm::vec3(-0.1f, 0.0f, 0.0f));  
 	Mf10 = glm::translate(Mf10, glm::vec3(-2.0f, 0.0f, -2.7f));
 	drawModel(P, V, Mf10, FISH, TEX_FISH);
 
