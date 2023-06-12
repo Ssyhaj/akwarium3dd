@@ -23,7 +23,7 @@
 
 #include "./include/myTeapot.h"
 
-#define FISH 0
+#define FISH 0  //przypisanie poszczegolnym modelom i teksturom 'pseudonimow' uzytych pozniej w kodzie
 #define TANK 1
 #define ROCK1 2
 #define ROCK2 3
@@ -45,15 +45,15 @@ glm::vec4 light1 = glm::vec4(-2.5, 6, 0, 1);
 glm::vec4 light2 = glm::vec4(2.5, 6, 0, 1);
 float speed = 1.5;
 
-struct MyVertex {
+struct MyVertex { //do wczytywania modeli z assimp
 	std::vector<glm::vec4> Vertices; //wierzcholki
 	std::vector<glm::vec4> Normals; //normalne
 	std::vector<glm::vec2> TexCoords; //wspolrzedne tekstur
 	std::vector<unsigned int> Indices; //indeksy wierzcholkow
 };
 
-std::vector<MyVertex> models;
-std::vector<GLuint> texs;
+std::vector<MyVertex> models;//wektor do modeli
+std::vector<GLuint> texs;//wektor do tekstur
 
 ShaderProgram* waterShader;
 ShaderProgram* phongShader;
@@ -64,10 +64,10 @@ void error_callback(int error, const char* description) {
 	fputs(description, stderr);
 }
 
-glm::vec3 cameraPos = glm::vec3(0.0f,2.0f, 3.0f);
+glm::vec3 cameraPos = glm::vec3(0.0f,2.0f, 3.0f);//poczatkowe ustawienia kamery
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod) {
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod) {//feedback z klawiszy
 	const float cameraSpeed = 0.13f;
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		cameraPos += cameraSpeed * cameraFront;
@@ -78,11 +78,11 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 }
-
+//poczatkowe ustawienia myszki
 float lastX = 400, lastY = 300;
 float yaw = -90.0f;
 float pitch;
-void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)//feedback z myszki
 {
 	float xoffset = xpos - lastX;
 	float yoffset = lastY - ypos;
@@ -109,66 +109,64 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 }
 
 void loadModel(std::string filename, int model_i) { //biblioteka assimp
-	models.push_back(MyVertex()); //nowy strukt myvertex do wektora models
+	models.push_back(MyVertex()); //nowe miejsce w wektorze do przechowywania modeli
 	Assimp::Importer importer; //strukt klasy importer uzyty do wczytywania pliku
 
 	const aiScene* scene = importer.ReadFile(filename, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals);
 	//wczytuje model z pliku o podanej sciezce , konwertowanie trojkatne, odwrocenie wspolrzednych uv generowanie gladnkich normalnych
 
 	aiMesh* mesh = scene->mMeshes[0]; //przypisanie wskaznika do siatki w mMeshes
-	for (int i = 0; i < mesh->mNumVertices; i++) {
+	for (int i = 0; i < mesh->mNumVertices; i++) {//przejscie przez kazdy wierzcholek
 
-		aiVector3D vertex = mesh->mVertices[i]; //pobierz pozycje wierzcholka
-		models[model_i].Vertices.push_back(glm::vec4(vertex.x, vertex.y, vertex.z, 1)); //dodaje do wektora vertices  jako vec4; czwarta - 1 to punkt w przestrzeni 3d
-
+		aiVector3D vertex = mesh->mVertices[i]; //pobierz pozycje wierzcholka (struktura aiVector3D sluzy do przechowywania trojwymiarowych obiektow)
+		models[model_i].Vertices.push_back(glm::vec4(vertex.x, vertex.y, vertex.z, 1)); //dodaje do wektora wierzcholek jako vec4; czwarta - 1 to punkt w przestrzeni 3d
 		aiVector3D normal = mesh->mNormals[i]; //pobierz normalna wierzcholka
 		models[model_i].Normals.push_back(glm::vec4(normal.x, normal.y, normal.z, 0)); //dodaje do wektora normalne jako vec4; czwarta - 0 to wektor w przestrzeni 3d
 
 
-		aiVector3D texCoord = mesh->mTextureCoords[0][i]; //wspolrzedne tesktury wierzcholka
-		models[model_i].TexCoords.push_back(glm::vec2(texCoord.x, texCoord.y));// dodaje je do wektora texcoords jako vec2
+		aiVector3D texCoord = mesh->mTextureCoords[0][i]; //wspolrzedne tesktury wierzcholka (dwuwymiarowa tablica bo tekstury w modelu chyba moga sie na siebie nakladac)
+		models[model_i].TexCoords.push_back(glm::vec2(texCoord.x, texCoord.y));// dodaje je do wektora wspolrzedne tekstury jako vec2
 	}
 	//Struktura aiFace jest częścią biblioteki Assimp i służy do przechowywania informacji o ścianach w siatce trójwymiarowej
-	for (int i = 0; i < mesh->mNumFaces; i++) {
+	for (int i = 0; i < mesh->mNumFaces; i++) { //przechodzi przez kazda sciane
 		aiFace& face = mesh->mFaces[i]; //referencja do obiektu aiFace o nazwie face  //face reprezentuje jedna sciane w siatce
-		for (int j = 0; j < face.mNumIndices; j++) {
+		for (int j = 0; j < face.mNumIndices; j++) { //przechodzi przez indeksy
 			models[model_i].Indices.push_back(face.mIndices[j]);//dodawanie do wektora indices
 		}
 	}
 }
 
 void readTexture(const char* filename, int tex_i) {
-	texs.push_back(0);
-	GLuint tex;
-	glActiveTexture(GL_TEXTURE0);
+	texs.push_back(0); //nowe miejsce w wektorze do przechowywania tekstur
+	GLuint tex; //zmienna gluint do trzymania jednej tekstury
+	glActiveTexture(GL_TEXTURE0); //ustawia aktywna jednostke teksturujaca na jednostke o indeksie 0
 
 	//Wczytanie do pamięci komputera
-	std::vector<unsigned char> image;   //Alokuj wektor do wczytania obrazka
-	unsigned width, height;   //Zmienne do których wczytamy wymiary obrazka
-	//Wczytaj obrazek
+	std::vector<unsigned char> image;   //alokuj wektor do wczytania obrazka
+	unsigned width, height;   //zmienne do których wczytamy wymiary 
 	unsigned error = lodepng::decode(image, width, height, filename);
 	glGenTextures(1, &tex); //Zainicjuj jeden uchwyt
 	glBindTexture(GL_TEXTURE_2D, tex); //Uaktywnij uchwyt
-	//Wczytaj obrazek do pamięci KG skojarzonej z uchwytem
+	//Wczytaj obrazek do pamięci GPU skojarzonej z uchwytem
 	glTexImage2D(GL_TEXTURE_2D, 0, 4, width, height, 0,
-		GL_RGBA, GL_UNSIGNED_BYTE, (unsigned char*)image.data());
+		GL_RGBA, GL_UNSIGNED_BYTE, (unsigned char*)image.data());//wczytanie tekstury z pamieci komputera do pamieci GPU
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);//parametry filtrowania tekstur zapewnia plynne przejscie miedzy pikselami tekstury przy skalowaniu
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	texs[tex_i] = tex;
+	texs[tex_i] = tex;//tex zapisany do wektora tekstur
 }
 
 void initOpenGLProgram(GLFWwindow* window) {
     initShaders();
-	glClearColor(0.9, 0.9, 0.9, 0.5); 
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glClearColor(0.9, 0.9, 0.9, 0.5);//kolor tla 
+	glEnable(GL_DEPTH_TEST);//ktory piksel jest blizej do kamery
+	glEnable(GL_BLEND);//dobrze dzialaja elementy przezroczyste
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//wspiera dzialanie przezroczystosci
 
-	glfwSetKeyCallback(window, key_callback);
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetKeyCallback(window, key_callback);//wlaczenie dzialania klawiatury
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);//kursor myszki zostaje ukryty i nie opuszcza okna, trzeba alttaabowac
+	glfwSetCursorPosCallback(window, mouse_callback);//ustawia funkcje zwrotna mouse_callback, wywolana przy zmianie pozycji kursora
 
 
 	readTexture("./img/fish.png", TEX_FISH);
@@ -200,7 +198,7 @@ void freeOpenGLProgram(GLFWwindow* window) {
 	glDeleteTextures(1, &texs[TEX_TANK]);
 	glDeleteTextures(1, &texs[TEX_ROCK1]);
 	glDeleteTextures(1, &texs[TEX_ROCK2]);
-	glDeleteTextures(1, &texs[TEX_BOTTOM]);
+	glDeleteTextures(1, &texs[TEX_BOTTOM]); //modeli nie trzeba usuwac bo nie sa zarzadzane przez OpenGL tylko przez assimp
 }
 
 void drawGlass(glm::mat4 P, glm::mat4 V, glm::mat4 M) {
@@ -225,7 +223,7 @@ void drawGlass(glm::mat4 P, glm::mat4 V, glm::mat4 M) {
 void drawModel(glm::mat4 P, glm::mat4 V, glm::mat4 M, int model_i, int texture) {
 	waterShader->use();
 
-	glUniformMatrix4fv(waterShader->u("P"), 1, false, glm::value_ptr(P)); //macierz projekci widoku i modelu do shadera wodnego
+	glUniformMatrix4fv(waterShader->u("P"), 1, false, glm::value_ptr(P)); //macierz projekci, widoku, i modelu do shadera wodnego
 	glUniformMatrix4fv(waterShader->u("V"), 1, false, glm::value_ptr(V)); //->u - uniform variable
 	glUniformMatrix4fv(waterShader->u("M"), 1, false, glm::value_ptr(M));
 	glUniform4fv(waterShader->u("light1"), 1, glm::value_ptr(light1));	//przeslanie wartosci swiatel do shadera wodnego
@@ -237,11 +235,12 @@ void drawModel(glm::mat4 P, glm::mat4 V, glm::mat4 M, int model_i, int texture) 
 	glEnableVertexAttribArray(waterShader->a("texCoord"));  //to samo
 	glVertexAttribPointer(waterShader->a("texCoord"), 2, GL_FLOAT, false, 0, models[model_i].TexCoords.data()); 
 	 
-	glActiveTexture(GL_TEXTURE0); //aktywuje teksture
+	glActiveTexture(GL_TEXTURE0); //aktywuje teksture //gl_texture0	jest domyslna jednostka teksturujaca 
 	glBindTexture(GL_TEXTURE_2D, texs[texture]); //powiazuje teksture z jednostka teskturujaca
 	glUniform1i(waterShader->u("tex"), 0); //przeslanie wartosci uniform dla tekstury
 
-	glDrawElements(GL_TRIANGLES, models[model_i].Indices.size(), GL_UNSIGNED_INT, models[model_i].Indices.data());
+	glDrawElements(GL_TRIANGLES, models[model_i].Indices.size(), GL_UNSIGNED_INT, models[model_i].Indices.data());//funkcja rysujaca model za pomoca indeksow
+	//indeksy lacza ze soba wierzcholki prymitywnych ksztaltow, tutaj trojkatow
 
 	glDisableVertexAttribArray(waterShader->a("vertex"));  //->a - attribute variable
 	glDisableVertexAttribArray(waterShader->a("normal"));
@@ -249,7 +248,7 @@ void drawModel(glm::mat4 P, glm::mat4 V, glm::mat4 M, int model_i, int texture) 
 }
 
 void drawRocks(glm::mat4 P, glm::mat4 V) {
-	glm::mat4 rocks = glm::mat4(1.0f);
+	glm::mat4 rocks = glm::mat4(1.0f); //macierz jednostkowa 4x4 najlatwiejsza do transformacji
 	rocks = glm::translate(rocks, glm::vec3(0.0f, -7.85f, 0.0f));
 	rocks = glm::scale(rocks, glm::vec3(0.25f, 0.25f, 0.25f));
 	glm::mat4 rocks1 = glm::mat4(1.0f);
@@ -289,48 +288,46 @@ void drawPlants(glm::mat4 P, glm::mat4 V) {
 void drawScene(GLFWwindow* window,float angle) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 
-	glm::mat4 M = glm::mat4(1.0f);
-	glm::mat4 V = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp); 
-	glm::mat4 P = glm::perspective(glm::radians(50.0f), 1.0f, 1.0f, 50.0f); 
+	glm::mat4 M = glm::mat4(1.0f);//macierz modelu
+	glm::mat4 V = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);//macierz widoku 
+	glm::mat4 P = glm::perspective(glm::radians(50.0f), 1.0f, 1.0f, 50.0f);  //macierz perspektywy
 	
 	glm::mat4 Ml1 = glm::translate(M, glm::vec3(light1[0], light1[1], light1[2]));
-	drawLight(P, V, Ml1);
+	drawLight(P, V, Ml1);//swiatlo1
 	glm::mat4 Ml2 = glm::translate(M, glm::vec3(light2[0], light2[1], light2[2]));
-	drawLight(P, V, Ml2);
+	drawLight(P, V, Ml2);//swiatlo2
 
-	glm::mat4 Mb = glm::translate(Mb, glm::vec3(-5.0f, 0.0f, 0.0f));
-	M = glm::rotate(M, -PI/2, glm::vec3(0.0f, 0.0f, 1.0f));
+	M = glm::rotate(M, -PI/2, glm::vec3(0.0f, 0.0f, 1.0f)); //macierz obrotu wokol osi Z
 
-	float wsp_nemo = 0.1f;
-	float wsp_fish_h = 0.1f;
+	float wsp_fish = 0.1f;
 
 	glm::mat4 FishMatrix = glm::mat4(1.0f);
-	glm::mat4 NemoMatrix = glm::scale(FishMatrix, glm::vec3(wsp_nemo, wsp_nemo, wsp_nemo));
-	glm::mat4 FishMatrix_h = glm::scale(FishMatrix, glm::vec3(wsp_fish_h, wsp_fish_h, wsp_fish_h));
+	glm::mat4 NemoMatrix = glm::scale(FishMatrix, glm::vec3(wsp_fish, wsp_fish, wsp_fish));
+	glm::mat4 FishMatrix_h = glm::scale(FishMatrix, glm::vec3(wsp_fish, wsp_fish, wsp_fish));
 
 
 	glm::mat4 Mf = glm::rotate(NemoMatrix, angle * 0.15f, glm::vec3(0.0f, -1.0f, 0.0f));
-	Mf = glm::translate(Mf, glm::vec3(4.0f / wsp_nemo, 0.0f, 0.0f));
+	Mf = glm::translate(Mf, glm::vec3(4.0f / wsp_fish, 0.0f, 0.0f));
 	drawModel(P, V, Mf, FISH2, TEX_FISH1);
 	
 	glm::mat4 Mf1 = glm::rotate(FishMatrix_h, -angle * 0.5f, glm::vec3(0.0f, -1.0f, 0.0f));
-	Mf1 = glm::translate(Mf1, glm::vec3(2.0f / wsp_fish_h, 2.0f / wsp_fish_h, 0.0f));
+	Mf1 = glm::translate(Mf1, glm::vec3(2.0f / wsp_fish, 2.0f / wsp_fish, 0.0f));
 	drawModel(P, V, Mf1, FISH1, TEX_FISH2);
 
 	glm::mat4 Mf2 = glm::rotate(NemoMatrix, angle * 0.19f, glm::vec3(0.0f, -1.0f, 0.0f));
-	Mf2 = glm::translate(Mf2, glm::vec3(1.0f / wsp_nemo, 1.0f / wsp_nemo, 0.0f));
+	Mf2 = glm::translate(Mf2, glm::vec3(1.0f / wsp_fish, 1.0f / wsp_fish, 0.0f));
 	drawModel(P, V, Mf2, FISH2, TEX_FISH1);
 
 	glm::mat4 Mf3 = glm::rotate(FishMatrix_h, -angle * 0.01f, glm::vec3(0.0f, -1.0f, 0.0f));
-	Mf3 = glm::translate(Mf3, glm::vec3(4.0f / wsp_fish_h, 3.0f / wsp_fish_h, 0.0f));
+	Mf3 = glm::translate(Mf3, glm::vec3(4.0f / wsp_fish, 3.0f / wsp_fish, 0.0f));
 	drawModel(P, V, Mf3, FISH1, TEX_FISH2);
 
 	glm::mat4 Mf4 = glm::rotate(NemoMatrix, angle * 0.16f, glm::vec3(0.0f, -1.0f, 0.0f));
-	Mf4 = glm::translate(Mf4, glm::vec3(6.0f / wsp_nemo, 2.0f / wsp_nemo, 0.0f));
+	Mf4 = glm::translate(Mf4, glm::vec3(6.0f / wsp_fish, 2.0f / wsp_fish, 0.0f));
 	drawModel(P, V, Mf4, FISH2, TEX_FISH1);
 
 	glm::mat4 Mf5 = glm::rotate(NemoMatrix, angle * 0.01f, glm::vec3(0.0f, -1.0f, 0.0f)); 
-	Mf5 = glm::translate(Mf5, glm::vec3(3.0f / wsp_nemo, 1.0f / wsp_nemo, 0.0f));
+	Mf5 = glm::translate(Mf5, glm::vec3(3.0f / wsp_fish, 1.0f / wsp_fish, 0.0f));
 	drawModel(P, V, Mf5, FISH2, TEX_FISH1);
 
 	glm::mat4 Mf7 = glm::rotate(M, angle * 0.01f, glm::vec3(-1.0f, 0.0f, 0.0f));  
@@ -360,7 +357,7 @@ void drawScene(GLFWwindow* window,float angle) {
 	glm::mat4 Mg = glm::scale(M, glm::vec3(8.0f, 6.0f, 6.0f));
 	drawGlass(P, V, Mg);
 
-	glfwSwapBuffers(window); 
+	glfwSwapBuffers(window); //zamiana tylniego bufora na przedni (nastepna klatka)
 
 }
 
@@ -397,19 +394,19 @@ int main(void)
 
 	
 	float angle = 0; 
-	glfwSetTime(0); 
-	while (!glfwWindowShouldClose(window)) 
+	glfwSetTime(0); //ustawia czas na 0
+	while (!glfwWindowShouldClose(window))//az do zamkniecia okna 
 	{
-		angle += speed * glfwGetTime(); 
-		glfwSetTime(0); 
-		drawScene(window,angle);
-		glfwPollEvents(); 
+		angle += speed * glfwGetTime(); //kat obrotu ryb to poprzedni kat plus predkosc ustalona wczesniej i czas od ostatniego wyowlania klatki
+		glfwSetTime(0); //czas na 0 (zeby tempo obrotu bylo rowne w czasie niezaleznie od klatek)
+		drawScene(window,angle);//rysuj scene
+		glfwPollEvents(); //feedback od klawiatury lub myszku
 	}
 
-	freeOpenGLProgram(window);
+	freeOpenGLProgram(window); //zwolnij tekstury i shadery
 
-	glfwDestroyWindow(window); 
-	glfwTerminate(); 
-	exit(EXIT_SUCCESS);
+	glfwDestroyWindow(window); //zamknij okno
+	glfwTerminate(); //wylacz program
+	exit(EXIT_SUCCESS);//wyjdz
 
 }
